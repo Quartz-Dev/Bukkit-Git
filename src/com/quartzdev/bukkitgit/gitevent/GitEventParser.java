@@ -7,7 +7,7 @@ import com.quartzdev.bukkitgit.webserver.WebRequest;
 
 public class GitEventParser {
 	
-	public void createNewGitEvent(WebRequest wr) {
+	public static void createNewGitEvent(WebRequest wr) {
 		JSONObject json = new JSONObject(wr.getContent());
 		
 		String masterBranch = json.getJSONObject("repository").getString("master_branch");

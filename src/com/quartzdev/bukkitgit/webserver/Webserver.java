@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 import org.bukkit.Bukkit;
 
+import com.quartzdev.bukkitgit.gitevent.GitEventParser;
+
 public class Webserver implements IWebserver, Runnable {
 	
 	private int port;
@@ -79,6 +81,7 @@ public class Webserver implements IWebserver, Runnable {
 						worked = true;
 						
 						logMessage("It worked");
+						GitEventParser.createNewGitEvent(request);
 					} else if ((headerLoc = request.getHeaders().indexOf("X-GitHub-Event: ping")) > 0) {
 						sendHeader(output, "HTTP/1.0 200 OK");
 						worked = true;
