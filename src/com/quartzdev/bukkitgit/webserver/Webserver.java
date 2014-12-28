@@ -40,7 +40,7 @@ public class Webserver implements IWebserver, Runnable {
 				BufferedReader input = new BufferedReader(new InputStreamReader(connectionsocket.getInputStream()));
 				RequestType rt = null;
 				String line = input.readLine();
-				logMessage("First line: " + line);
+				// logMessage("First line: " + line);
 				if (line.startsWith("GET")) {
 					rt = RequestType.GET;
 				} else if (line.startsWith("POST")) {
@@ -51,7 +51,7 @@ public class Webserver implements IWebserver, Runnable {
 				int contentLength = 0;
 				ArrayList<String> headers = new ArrayList<String>();
 				while (!(line = input.readLine()).equals("")) {
-					logMessage("Headers: " + line);
+					// logMessage("Headers: " + line);
 					if (line.startsWith("Content-Length:")) {
 						hasBody = true;
 						contentLength = Integer.parseInt(line.split(": ")[1]);
@@ -80,18 +80,18 @@ public class Webserver implements IWebserver, Runnable {
 						sendHeader(output, "HTTP/1.0 200 OK");
 						worked = true;
 						
-						logMessage("It worked");
+						// logMessage("It worked");
 						GitEventParser.createNewGitEvent(request);
 					} else if ((headerLoc = request.getHeaders().indexOf("X-GitHub-Event: ping")) > 0) {
 						sendHeader(output, "HTTP/1.0 200 OK");
 						worked = true;
 						
-						logMessage("Ping received.");
+						// TODO logMessage("Ping received.");
 					} else {
 						sendHeader(output, "HTTP/1.0 400 Bad Request");
 						// TODO log message that unneccessary thing was called
 					}
-					logMessage("headerLoc: " + headerLoc);
+					// logMessage("headerLoc: " + headerLoc);
 				} else {
 					sendHeader(output, "HTTP/1.0 405 Method Not Allowed");
 				}
@@ -107,7 +107,7 @@ public class Webserver implements IWebserver, Runnable {
 				// logMessage("Output closed");
 				
 			} catch (SocketException e) {
-				logMessage("Server not running!");
+				// TODO? ignore
 			} catch (Exception e) {
 				// TODO
 				e.printStackTrace();
