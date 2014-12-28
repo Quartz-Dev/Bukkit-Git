@@ -11,8 +11,8 @@ public class Loggers {
 	
 	public static void logGitEvent(GitEvent event) {
 		Logger l = Bukkit.getLogger();
-		String color = Ansi.ansi().fg(Ansi.Color.BLUE) + "";
-		String endColor = Ansi.ansi().fg(Ansi.Color.DEFAULT) + "";
+		String color = Ansi.ansi().fg(Ansi.Color.BLUE) + "" + Ansi.ansi().bg(Ansi.Color.WHITE);
+		String endColor = Ansi.ansi().fg(Ansi.Color.DEFAULT) + "" + Ansi.ansi().bg(Ansi.Color.DEFAULT);
 		
 		l.info(color + "=============" + endColor);
 		l.info(color + "New Github push on " + event.getRepositoryFullName() + " by " + event.getCommiter() + endColor);
