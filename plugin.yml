@@ -1,0 +1,10 @@
+name: Bukkit-Git
+version: 1.0
+description: Allows for plugins to be updated automatically when updated from Github
+author: Quartz-Dev
+
+main: com.quartzdev.bukkitgit.MainClass
+
+commands: 
+  bukkitgit:
+    description: Retrieves general information about the plugin.
