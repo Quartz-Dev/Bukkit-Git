@@ -15,7 +15,7 @@ public class GitEventParser {
 		String repositoryFullName = json.getJSONObject("repository").getString("full_name");
 		String compressionType = "zipball"; // TODO Customizable?
 		String compareLink = json.getString("compare");
-		String commiter = json.getJSONObject("head_commit").getJSONObject("commiter").getString("username");
+		String commiter = json.getJSONObject("head_commit").getJSONObject("committer").getString("username");
 		String commitMessage = json.getJSONObject("head_commit").getString("message");
 		
 		GitEvent event = new GitEvent(wr.getType(), wr.getHeaders(), wr.getContent(), masterBranch, defaultBranch, repositoryFullName, compressionType, compareLink, commiter, commitMessage);
