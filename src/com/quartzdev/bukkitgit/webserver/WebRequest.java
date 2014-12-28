@@ -4,25 +4,25 @@ import java.util.ArrayList;
 
 public class WebRequest {
 	
-	public RequestType type;
-	public ArrayList<String> headers;
-	public ArrayList<String> content;
+	private RequestType type;
+	private ArrayList<String> headers;
+	private String content;
 	
-	protected WebRequest(RequestType type, ArrayList<String> headers, ArrayList<String> content) {
+	public WebRequest(RequestType type, ArrayList<String> headers, String content) {
 		this.type = type;
 		this.headers = headers;
 		this.content = content;
 	}
 	
-	protected RequestType getType() {
+	public RequestType getType() {
 		return type;
 	}
 	
-	protected ArrayList<String> getHeaders() {
+	public ArrayList<String> getHeaders() {
 		return headers;
 	}
 	
-	protected ArrayList<String> getContent() {
+	public String getContent() {
 		return content;
 	}
 	

@@ -7,11 +7,51 @@ import com.quartzdev.bukkitgit.webserver.WebRequest;
 
 public class GitEvent extends WebRequest {
 	
-	protected GitEvent(RequestType type, ArrayList<String> headers, ArrayList<String> content) {
+	private String masterBranch;
+	private String defaultBranch;
+	private String repositoryFullName;
+	private String compressionType;
+	private String compareLink;
+	private String commiter;
+	private String commitMessage;
+	
+	public GitEvent(RequestType type, ArrayList<String> headers, String content, String masterBranch, String defaultBranch, String repositoryFullName, String compressionType, String compareLink, String commiter, String commitMessage) {
 		super(type, headers, content);
-		// TODO Auto-generated constructor stub
+		this.masterBranch = masterBranch;
+		this.defaultBranch = defaultBranch;
+		this.repositoryFullName = repositoryFullName;
+		this.compressionType = compressionType;
+		this.compareLink = compareLink;
+		this.commiter = commiter;
+		this.commitMessage = commitMessage;
 	}
 	
-	private EventType eventType;
+	public String getMasterBranch() {
+		return masterBranch;
+	}
+	
+	public String getDefaultBranch() {
+		return defaultBranch;
+	}
+	
+	public String getRepositoryFullName() {
+		return repositoryFullName;
+	}
+	
+	public String getCompressionType() {
+		return compressionType;
+	}
+	
+	public String getCompareLink() {
+		return compareLink;
+	}
+	
+	public String getCommiter() {
+		return commiter;
+	}
+	
+	public String getCommitMessage() {
+		return commitMessage;
+	}
 	
 }
