@@ -50,7 +50,7 @@ public class GitDownloader implements Runnable {
 			while (ze != null) {
 				
 				String entryName = ze.getName();
-				File newFile = new File(unzippedFolder + File.separator + entryName);
+				File newFile = new File(unzippedFolder.getAbsolutePath() + File.separator + entryName);
 				
 				System.out.println("file unzip : " + newFile.getAbsoluteFile());
 				
