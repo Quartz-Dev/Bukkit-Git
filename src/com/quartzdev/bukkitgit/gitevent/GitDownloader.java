@@ -71,7 +71,9 @@ public class GitDownloader implements Runnable {
 			manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
 			JarOutputStream target = new JarOutputStream(new FileOutputStream(newJar.getAbsoluteFile()), manifest);
 			Bukkit.broadcastMessage("Inside folder: " + insideFolder);
-			moveFilesIntoJar(insideFolder, target);
+			for (File f : insideFolder.listFiles()) {
+				moveFilesIntoJar(f, target);
+			}
 			target.close();
 			
 		} catch (IOException e) {
