@@ -37,6 +37,7 @@ public class GitDownloader implements Runnable {
 			
 			for (File file : dest.listFiles()) {
 				if (Pattern.matches("*.java", file.getName())) {
+					// Test
 					Bukkit.broadcastMessage("Java file: Path: " + file.getPath() + ", File: " + file.getName());
 					JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 					DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
