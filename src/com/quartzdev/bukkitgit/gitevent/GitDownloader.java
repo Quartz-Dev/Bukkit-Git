@@ -56,8 +56,11 @@ public class GitDownloader implements Runnable {
 				
 				System.out.println("file unzip : " + newFile.getAbsoluteFile());
 				
-				new File(newFile.getParent()).mkdirs();
-				
+				try {
+					new File(newFile.getParent()).mkdirs();
+				} catch (Exception e) {
+					// Do nothing
+				}
 				FileOutputStream fos = new FileOutputStream(newFile);
 				
 				int len;
