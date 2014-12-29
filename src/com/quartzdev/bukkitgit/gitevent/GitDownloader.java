@@ -51,13 +51,12 @@ public class GitDownloader implements Runnable {
 			
 			Collection<File> files = FileUtils.listFiles(insideFolder, new RegexFileFilter("^(.*?)"), DirectoryFileFilter.DIRECTORY);
 			for (File file : files) {
-				Bukkit.broadcastMessage("A file: Path: " + file.getPath() + ", File: " + file.getName());
 				if (Pattern.matches("([^\\s]+(\\.(?i)(java))$)", file.getName())) {
 					Bukkit.broadcastMessage("Java file: Path: " + file.getPath() + ", File: " + file.getName());
 					JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 					DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 					StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
-					Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromStrings(Arrays.asList("YouFileToCompile.java"));
+					Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromStrings(Arrays.asList(file.getPath()));
 					JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnits);
 					boolean success = task.call();
 					fileManager.close();
