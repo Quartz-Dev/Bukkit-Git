@@ -120,7 +120,7 @@ public class GitDownloader implements Runnable {
 		BufferedInputStream in = null;
 		try {
 			if (source.isDirectory()) {
-				String name = source.getPath().replace(zipLoc, "").replace("\\", "/").replaceFirst("/", "");
+				String name = source.getPath().replace(zipLoc, "").replace("\\", "/").replaceFirst("src/", "").replaceFirst("/", "");
 				if (!name.isEmpty()) {
 					if (!name.endsWith("/"))
 						name += "/";
@@ -134,7 +134,7 @@ public class GitDownloader implements Runnable {
 				return;
 			}
 			
-			JarEntry entry = new JarEntry(source.getPath().replace(zipLoc, "").replace("\\", "/").replaceFirst("/", ""));
+			JarEntry entry = new JarEntry(source.getPath().replace(zipLoc, "").replace("\\", "/").replaceFirst("src/", "").replaceFirst("/", ""));
 			entry.setTime(source.lastModified());
 			target.putNextEntry(entry);
 			in = new BufferedInputStream(new FileInputStream(source));
