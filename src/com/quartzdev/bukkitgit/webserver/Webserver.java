@@ -7,20 +7,29 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.security.SignatureException;
 import java.util.ArrayList;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 
 import org.bukkit.Bukkit;
 
 import com.quartzdev.bukkitgit.gitevent.GitEventParser;
 
-public class Webserver implements IWebserver, Runnable {
+public class Webserver implements Runnable {
+	
+	private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 	
 	private int port;
+	private String secret;
 	ServerSocket serverSocket;
 	
-	public Webserver(int port) {
+	public Webserver(int port, String secret) {
 		this.port = port;
 		serverSocket = null;
+		this.secret = secret;
 	}
 	
 	@Override
@@ -75,14 +84,29 @@ public class Webserver implements IWebserver, Runnable {
 				boolean worked = false;
 				DataOutputStream output = new DataOutputStream(connectionsocket.getOutputStream());
 				if (request.getType() == RequestType.POST) {
-					int headerLoc;
-					if ((headerLoc = request.getHeaders().indexOf("X-GitHub-Event: push")) > 0) {
-						sendHeader(output, "HTTP/1.0 200 OK");
-						worked = true;
+					if (request.getHeaders().indexOf("X-GitHub-Event: push") >= 0) {
+						
+						boolean secure = false;
+						for (String header : request.getHeaders()) {
+							if (header.startsWith("X-Hub-Signature:")) {
+								String recievedDigest = header.split("sha1=")[1];
+								String ourDigest = hmac(request.getContent(), secret);
+								if (recievedDigest.equals(ourDigest)) {
+									secure = true;
+								}
+							}
+						}
+						
+						if (secure) {
+							sendHeader(output, "HTTP/1.0 200 OK");
+							worked = true;
+						} else {
+							sendHeader(output, "HTTP/1.0 400 Bad Request");
+						}
 						
 						// logMessage("It worked");
 						GitEventParser.createNewGitEvent(request);
-					} else if ((headerLoc = request.getHeaders().indexOf("X-GitHub-Event: ping")) > 0) {
+					} else if (request.getHeaders().indexOf("X-GitHub-Event: ping") >= 0) {
 						sendHeader(output, "HTTP/1.0 200 OK");
 						worked = true;
 						
@@ -118,7 +142,6 @@ public class Webserver implements IWebserver, Runnable {
 		
 	}
 	
-	@Override
 	public void onShutdown() {
 		// TODO Auto-generated method stub
 		closeServer();
@@ -161,6 +184,29 @@ public class Webserver implements IWebserver, Runnable {
 	
 	private WebRequest createWebRequest(RequestType rt, ArrayList<String> headers, String body) {
 		return new WebRequest(rt, headers, body);
+	}
+	
+	public static String hmac(String data, String key) throws java.security.SignatureException {
+		String result;
+		try {
+			
+			// get an hmac_sha1 key from the raw key bytes
+			SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), HMAC_SHA1_ALGORITHM);
+			
+			// get an hmac_sha1 Mac instance and initialize with the signing key
+			Mac mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
+			mac.init(signingKey);
+			
+			// compute the hmac on input data bytes
+			byte[] rawHmac = mac.doFinal(data.getBytes());
+			
+			// base64-encode the hmac
+			result = DatatypeConverter.printBase64Binary(rawHmac);
+			
+		} catch (Exception e) {
+			throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
+		}
+		return result;
 	}
 	
 }
