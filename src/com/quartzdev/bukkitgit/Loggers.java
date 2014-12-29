@@ -15,7 +15,7 @@ public class Loggers {
 		String endColor = Ansi.ansi().fg(Ansi.Color.DEFAULT) + "";
 		
 		l.info(color + "=============" + endColor);
-		l.info(color + "New Github push on " + event.getRepositoryFullName() + " by " + event.getCommiter() + endColor);
+		l.info(color + "New Github push to " + event.getRepositoryFullName() + " by " + event.getCommiter() + endColor);
 		l.info(color + event.getCommitMessage() + endColor);
 		l.info(color + "Compare: " + event.getCompareLink() + endColor);
 		l.info(color + "=============" + endColor);
