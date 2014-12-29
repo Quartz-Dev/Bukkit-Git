@@ -1,14 +1,10 @@
 package com.quartzdev.bukkitgit.gitevent;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
@@ -45,7 +41,10 @@ public class GitDownloader implements Runnable {
 			
 			FileUtils.copyURLToFile(website, dest);
 			
-			unzip(dest.getAbsolutePath(), unzippedFolder.getAbsolutePath());
+			Unzipper uz = new Unzipper();
+			Bukkit.broadcastMessage("Arg 1- " + dest.getAbsolutePath());
+			Bukkit.broadcastMessage("Arg 2- " + unzippedFolder.getAbsolutePath());
+			uz.unzip(dest.getAbsolutePath(), unzippedFolder.getAbsolutePath());
 			
 			for (File file : unzippedFolder.listFiles()) {
 				if (Pattern.matches("*.java", file.getName())) {
@@ -69,52 +68,4 @@ public class GitDownloader implements Runnable {
 		
 	}
 	
-	public void unzip(String zipFile, String outputFolder) {
-		
-		byte[] buffer = new byte[1024];
-		
-		try {
-			
-			// create output directory is not exists
-			File folder = new File(outputFolder);
-			if (!folder.exists()) {
-				folder.mkdir();
-			}
-			
-			// get the zip file content
-			ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
-			// get the zipped file list entry
-			ZipEntry ze = zis.getNextEntry();
-			
-			while (ze != null) {
-				
-				String fileName = ze.getName();
-				File newFile = new File(outputFolder + File.separator + fileName);
-				
-				System.out.println("file unzip : " + newFile.getAbsoluteFile());
-				
-				// create all non exists folders
-				// else you will hit FileNotFoundException for compressed folder
-				new File(newFile.getParent()).mkdirs();
-				
-				FileOutputStream fos = new FileOutputStream(newFile);
-				
-				int len;
-				while ((len = zis.read(buffer)) > 0) {
-					fos.write(buffer, 0, len);
-				}
-				
-				fos.close();
-				ze = zis.getNextEntry();
-			}
-			
-			zis.closeEntry();
-			zis.close();
-			
-			System.out.println("Done");
-			
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-	}
 }
