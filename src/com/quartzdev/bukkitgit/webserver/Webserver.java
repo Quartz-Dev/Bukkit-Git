@@ -100,12 +100,12 @@ public class Webserver implements Runnable {
 						if (secure) {
 							sendHeader(output, "HTTP/1.0 200 OK");
 							worked = true;
+							GitEventParser.createNewGitEvent(request);
 						} else {
 							sendHeader(output, "HTTP/1.0 400 Bad Request");
 						}
 						
 						// logMessage("It worked");
-						GitEventParser.createNewGitEvent(request);
 					} else if (request.getHeaders().indexOf("X-GitHub-Event: ping") >= 0) {
 						sendHeader(output, "HTTP/1.0 200 OK");
 						worked = true;
@@ -123,7 +123,7 @@ public class Webserver implements Runnable {
 				sendHeaders(output, responseHeaders);
 				
 				if (worked) {
-					sendHeader(output, "Plugin updated.");
+					sendHeader(output, "Request Acknowledged.");
 				}
 				
 				input.close();
