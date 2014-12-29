@@ -15,49 +15,53 @@ import javax.crypto.spec.SecretKeySpec;
 
 import net.minecraft.util.org.apache.commons.codec.binary.Hex;
 
-import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
+import com.quartzdev.bukkitgit.Loggers;
 import com.quartzdev.bukkitgit.gitevent.GitEventParser;
 
 public class Webserver implements Runnable {
 	
 	private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
+	private static final int maxTimesPingRecieved = 3;
 	
 	private int port;
 	private String secret;
+	private int timesPingRecieved;
 	ServerSocket serverSocket;
+	Plugin plugin;
 	
-	public Webserver(int port, String secret) {
+	public Webserver(int port, String secret, Plugin plugin) {
 		this.port = port;
 		serverSocket = null;
 		this.secret = secret;
+		timesPingRecieved = 0;
+		this.plugin = plugin;
 	}
 	
 	@Override
 	public void run() {
-		logMessage("Starting server...");
+		Loggers.logMessage("Starting webhook server...");
 		try {
 			serverSocket = new ServerSocket(port);
 		} catch (Exception e) {
-			// TODO disable plugin.
-			e.printStackTrace();
+			Loggers.logMessage("The webhook server could not be started.");
+			Loggers.logMessage("You are no longer receiving automatic updates");
+			Loggers.logMessage("Try reloading the plugin, if the problem persits please notify the authors");
 			return;
 		}
+		
 		do {
 			try {
 				Socket connectionsocket = serverSocket.accept();
-				// TODO Make message logs more useful.
 				BufferedReader input = new BufferedReader(new InputStreamReader(connectionsocket.getInputStream()));
 				String line = input.readLine();
 				RequestType rt = setRequestType(line);
-				
-				// logMessage("First line: " + line);
 				
 				boolean hasBody = false;
 				int contentLength = 0;
 				ArrayList<String> headers = new ArrayList<String>();
 				while (!(line = input.readLine()).equals("")) {
-					// logMessage("Headers: " + line);
 					if (line.startsWith("Content-Length:")) {
 						hasBody = true;
 						contentLength = Integer.parseInt(line.split(": ")[1]);
@@ -97,22 +101,26 @@ public class Webserver implements Runnable {
 						if (secure) {
 							sendHeader(output, "HTTP/1.0 200 OK");
 							worked = true;
-							GitEventParser.createNewGitEvent(request);
+							GitEventParser.createNewGitEvent(request, plugin);
 						} else {
 							sendHeader(output, "HTTP/1.0 400 Bad Request");
 						}
 						
-						// logMessage("It worked");
 					} else if (request.getHeaders().indexOf("X-GitHub-Event: ping") >= 0) {
 						sendHeader(output, "HTTP/1.0 200 OK");
 						worked = true;
 						
-						// TODO logMessage("Ping received.");
+						if (timesPingRecieved < maxTimesPingRecieved) {
+							Loggers.logMessage("Ping received from GitHub.");
+							timesPingRecieved++;
+						}
 					} else {
-						sendHeader(output, "HTTP/1.0 400 Bad Request");
-						// TODO log message that unneccessary thing was called
+						sendHeader(output, "HTTP/1.0 501 Not Implemented");
+						if (timesPingRecieved < maxTimesPingRecieved) {
+							Loggers.logMessage("An unnecessary GitHub event was recieved. The only events required are the push event.");
+							timesPingRecieved++;
+						}
 					}
-					// logMessage("headerLoc: " + headerLoc);
 				} else {
 					sendHeader(output, "HTTP/1.0 405 Method Not Allowed");
 				}
@@ -125,33 +133,25 @@ public class Webserver implements Runnable {
 				
 				input.close();
 				output.close();
-				// logMessage("Output closed");
 				
 			} catch (SocketException e) {
 				// TODO? ignore
 			} catch (Exception e) {
-				// TODO
+				Loggers.logMessage("An exception occurred whilst running the webhook server");
 				e.printStackTrace();
+				Loggers.logMessage("The webhook server will now shut down.");
 				closeServer();
 			}
 		} while (!serverSocket.isClosed());
-		closeServer();
 		
 	}
 	
 	public void onShutdown() {
-		// TODO Auto-generated method stub
 		closeServer();
-		
-	}
-	
-	public void logMessage(Object contents) {
-		java.util.logging.Logger log = Bukkit.getLogger();
-		log.info("Stuff from Web: " + contents);
 	}
 	
 	private void closeServer() {
-		logMessage("Stopping server");
+		Loggers.logMessage("Webhook server stopping...");
 		if (serverSocket != null) {
 			try {
 				serverSocket.close();
@@ -187,17 +187,10 @@ public class Webserver implements Runnable {
 		String result;
 		try {
 			
-			// get an hmac_sha1 key from the raw key bytes
 			SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), HMAC_SHA1_ALGORITHM);
-			
-			// get an hmac_sha1 Mac instance and initialize with the signing key
 			Mac mac = Mac.getInstance(HMAC_SHA1_ALGORITHM);
 			mac.init(signingKey);
-			
-			// compute the hmac on input data bytes
 			byte[] rawHmac = mac.doFinal(data.getBytes());
-			
-			// base64-encode the hmac
 			result = Hex.encodeHexString(rawHmac);
 			
 		} catch (Exception e) {

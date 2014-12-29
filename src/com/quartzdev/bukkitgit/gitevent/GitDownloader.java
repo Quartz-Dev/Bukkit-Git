@@ -30,7 +30,11 @@ import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.UnknownDependencyException;
 
+import com.quartzdev.bukkitgit.Loggers;
+
 public class GitDownloader implements Runnable {
+	
+	private final static String JDK_ARTICLE = "https://github.com/Quartz-Dev/Bukkit-Git/wiki/Why-JDKs-are-important";
 	
 	private String repoFullName;
 	private String defaultBranch;
@@ -38,13 +42,18 @@ public class GitDownloader implements Runnable {
 	private String repoName;
 	
 	private String zipLoc;
+	private Plugin plugin;
 	
-	public GitDownloader(GitEvent event) {
+	private File dest;
+	private File unzippedFolder;
+	
+	public GitDownloader(GitEvent event, Plugin plugin) {
 		repoFullName = event.getRepositoryFullName();
 		repoName = event.getRepositoryName();
 		defaultBranch = event.getDefaultBranch();
 		compressionType = event.getCompressionType();
 		zipLoc = null;
+		this.plugin = plugin;
 	}
 	
 	@Override
@@ -57,8 +66,8 @@ public class GitDownloader implements Runnable {
 			String unzippedFolderPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + "unzip";
 			String destPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + ".zip";
 			String newJarPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + "jar_" + fileName + ".jar";
-			File unzippedFolder = new File(unzippedFolderPath);
-			File dest = new File(destPath);
+			unzippedFolder = new File(unzippedFolderPath);
+			dest = new File(destPath);
 			File newJar = new File(newJarPath);
 			ArrayList<File> filesToCompile = new ArrayList<File>();
 			File newPlugin = new File("plugins" + File.separator + repoName + ".jar");
@@ -85,36 +94,53 @@ public class GitDownloader implements Runnable {
 			moveFilesIntoJar(insideFolder, target);
 			target.close();
 			
-			dest.delete();
-			FileUtils.deleteDirectory(unzippedFolder);
+			deleteTempFiles();
 			
 			migrateJar(newJar, repoName);
 			
 		} catch (IOException e) {
-			// TODO Make it do something useful
+			Loggers.logError("Something bad happened while downloading a plugin.");
 			e.printStackTrace();
 		}
 		
 	}
 	
+	private void deleteTempFiles() throws IOException {
+		dest.delete();
+		FileUtils.deleteDirectory(unzippedFolder);
+	}
+	
 	private void compileJava(ArrayList<File> files) throws IOException {
-		System.setProperty("java.home", "C:\\Program Files\\Java\\jdk1.7.0_51");
-		// TODO [SEVERE] Not everyone will have the same version
-		// TODO warn user of change, also detect which version the user has
+		
+		File home = new File(System.getProperty("java.home"));
+		String oldHome = System.getProperty("java.home");
+		boolean jdkChanged = false;
+		if (!home.getName().startsWith("jdk")) {
+			String jdk = findJDK(home);
+			if (jdk != null) {
+				jdkChanged = true;
+				System.setProperty("java.home", jdk);
+			} else {
+				Loggers.logError("There is no JDK installed!");
+				Loggers.logError("Please see the GitHub article about why a JDK is important for this plugin");
+				Loggers.logError(JDK_ARTICLE);
+				deleteTempFiles();
+				Bukkit.getPluginManager().disablePlugin(plugin);
+				return;
+			}
+		}
 		
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-		if (compiler == null) {
-			// TODO show error for bad version, yeah
-			// https://www.java.net/node/688208
-			Bukkit.broadcastMessage("Compiler is null!");
-			return;
-		}
 		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
 		StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
 		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(files);
 		JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnits);
 		task.call();
 		fileManager.close();
+		
+		if (jdkChanged) {
+			System.setProperty("java.home", oldHome);
+		}
 	}
 	
 	private void moveFilesIntoJar(File source, JarOutputStream target) throws IOException {
@@ -160,7 +186,6 @@ public class GitDownloader implements Runnable {
 		try {
 			Bukkit.getPluginManager().loadPlugin(newPlugin);
 		} catch (UnknownDependencyException | InvalidDescriptionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidPluginException e) {
 			reloadPlugin(pluginName);
@@ -179,8 +204,21 @@ public class GitDownloader implements Runnable {
 			}
 			Bukkit.getPluginManager().enablePlugin(plugin);
 		} else {
-			// TODO This means that their plugin.yml name wasn't the same as
-			// the repository name.
+			Loggers.logMessage("The plugin " + pluginName + " wasn't reloaded.");
+			Loggers.logMessage("Change the plugin.yml name to be the same as the repository name to allow for easier reloading.");
+			// TODO Change this in the future.
 		}
+	}
+	
+	private String findJDK(File home) {
+		File parent = home.getParentFile();
+		
+		for (File child : parent.listFiles()) {
+			if (child.getName().startsWith("jdk")) {
+				return child.getAbsolutePath();
+			}
+		}
+		
+		return null;
 	}
 }

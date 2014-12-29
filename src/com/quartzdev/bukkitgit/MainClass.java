@@ -14,7 +14,7 @@ public class MainClass extends JavaPlugin {
 		port = 8022;
 		secret = "pie";
 		
-		webserver = new Webserver(port, secret);
+		webserver = new Webserver(port, secret, this);
 		Thread thread = new Thread(webserver);
 		thread.start();
 	}
