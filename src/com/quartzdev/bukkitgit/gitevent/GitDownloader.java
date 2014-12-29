@@ -80,7 +80,6 @@ public class GitDownloader implements Runnable {
 			Manifest manifest = new Manifest();
 			manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
 			JarOutputStream target = new JarOutputStream(new FileOutputStream(newJar.getAbsoluteFile()), manifest);
-			Bukkit.broadcastMessage("Inside folder: " + insideFolder.getPath());
 			zipLoc = insideFolder.getPath();
 			moveFilesIntoJar(insideFolder, target);
 			target.close();
@@ -111,7 +110,6 @@ public class GitDownloader implements Runnable {
 		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(files);
 		JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnits);
 		boolean success = task.call();
-		Bukkit.broadcastMessage("Success: " + success);
 		fileManager.close();
 	}
 	
