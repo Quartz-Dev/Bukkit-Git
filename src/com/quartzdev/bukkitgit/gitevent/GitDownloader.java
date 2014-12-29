@@ -107,6 +107,7 @@ public class GitDownloader implements Runnable {
 		try {
 			if (source.isDirectory()) {
 				String name = source.getPath().replace("\\", "/").replace(zipLoc, "");
+				Bukkit.broadcastMessage("Name: " + name);
 				if (!name.isEmpty()) {
 					if (!name.endsWith("/"))
 						name += "/";
@@ -121,6 +122,7 @@ public class GitDownloader implements Runnable {
 			}
 			
 			JarEntry entry = new JarEntry(source.getPath().replace("\\", "/").replace(zipLoc, ""));
+			Bukkit.broadcastMessage("Entry: " + source.getPath().replace("\\", "/").replace(zipLoc, ""));
 			entry.setTime(source.lastModified());
 			target.putNextEntry(entry);
 			in = new BufferedInputStream(new FileInputStream(source));
