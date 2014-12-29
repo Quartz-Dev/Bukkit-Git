@@ -84,10 +84,11 @@ public class GitDownloader implements Runnable {
 			moveFilesIntoJar(insideFolder, target);
 			target.close();
 			
-			migrateJar(newJar, repoName);
-			
 			dest.delete();
 			unzippedFolder.delete();
+			
+			migrateJar(newJar, repoName);
+			
 		} catch (IOException e) {
 			// TODO Make it do something useful
 			e.printStackTrace();
