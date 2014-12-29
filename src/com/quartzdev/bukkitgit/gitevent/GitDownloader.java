@@ -62,6 +62,7 @@ public class GitDownloader implements Runnable {
 				try {
 					new File(newFile.getParent()).mkdirs();
 					
+					newFile.createNewFile();
 					FileOutputStream fos = new FileOutputStream(newFile);
 					
 					int len;
