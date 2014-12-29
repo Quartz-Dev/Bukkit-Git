@@ -29,14 +29,15 @@ import org.bukkit.Bukkit;
 public class GitDownloader implements Runnable {
 	
 	private GitEvent event;
+	private String zipLoc;
 	
 	public GitDownloader(GitEvent event) {
 		this.event = event;
+		zipLoc = null;
 	}
 	
 	@Override
 	public void run() {
-		byte[] buffer = new byte[1024];
 		
 		try {
 			// TODO allow choice for master branch or default branch maybe
@@ -65,12 +66,11 @@ public class GitDownloader implements Runnable {
 			}
 			compileJava(filesToCompile);
 			
-			files = FileUtils.listFiles(insideFolder, new RegexFileFilter("^(.*?)"), DirectoryFileFilter.DIRECTORY);
-			
 			Manifest manifest = new Manifest();
 			manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
 			JarOutputStream target = new JarOutputStream(new FileOutputStream(newJar.getAbsoluteFile()), manifest);
-			Bukkit.broadcastMessage("Inside folder: " + insideFolder);
+			Bukkit.broadcastMessage("Inside folder: " + insideFolder.getPath());
+			zipLoc = insideFolder.getPath();
 			moveFilesIntoJar(insideFolder, target);
 			target.close();
 			
@@ -106,7 +106,7 @@ public class GitDownloader implements Runnable {
 		BufferedInputStream in = null;
 		try {
 			if (source.isDirectory()) {
-				String name = source.getPath().replace("\\", "/");
+				String name = source.getPath().replace("\\", "/").replace(zipLoc, "");
 				if (!name.isEmpty()) {
 					if (!name.endsWith("/"))
 						name += "/";
@@ -120,7 +120,7 @@ public class GitDownloader implements Runnable {
 				return;
 			}
 			
-			JarEntry entry = new JarEntry(source.getPath().replace("\\", "/").replace(source.getPath(), ""));
+			JarEntry entry = new JarEntry(source.getPath().replace("\\", "/").replace(zipLoc, ""));
 			entry.setTime(source.lastModified());
 			target.putNextEntry(entry);
 			in = new BufferedInputStream(new FileInputStream(source));
