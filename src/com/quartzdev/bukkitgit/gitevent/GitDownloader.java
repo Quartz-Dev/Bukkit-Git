@@ -36,9 +36,12 @@ public class GitDownloader implements Runnable {
 			// TODO allow choice for master branch or default branch maybe
 			URL website = new URL("https://api.github.com/repos/" + event.getRepositoryFullName() + "/" + event.getCompressionType() + "/" + event.getDefaultBranch());
 			String fileName = System.currentTimeMillis() + "";
-			File dest = new File("plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + ".zip");
-			File unzippedFolder = new File("plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + "unzip" + File.separator);
-			File newJar = new File("plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + "jar_" + fileName + ".jar");
+			String unzippedFolderPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + "unzip";
+			String destPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + ".zip";
+			String newJarPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + "jar_" + fileName + ".jar";
+			File unzippedFolder = new File(unzippedFolderPath);
+			File dest = new File(destPath);
+			File newJar = new File(newJarPath);
 			
 			FileUtils.copyURLToFile(website, dest);
 			
@@ -52,7 +55,7 @@ public class GitDownloader implements Runnable {
 			while (ze != null) {
 				
 				String entryName = ze.getName();
-				File newFile = new File(unzippedFolder.getAbsolutePath() + File.separator + entryName);
+				File newFile = new File(unzippedFolderPath + File.separator + entryName);
 				
 				System.out.println("file unzip : " + newFile.getAbsoluteFile());
 				
@@ -68,7 +71,7 @@ public class GitDownloader implements Runnable {
 					
 					fos.close();
 				} catch (Exception e) {
-					// Do nothing
+					e.printStackTrace();
 				}
 				ze = zis.getNextEntry();
 			}
