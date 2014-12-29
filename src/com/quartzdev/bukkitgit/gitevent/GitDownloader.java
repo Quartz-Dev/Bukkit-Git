@@ -70,7 +70,6 @@ public class GitDownloader implements Runnable {
 	private void compileJava(ArrayList<File> files) throws IOException {
 		System.setProperty("java.home", "C:\\Program Files\\Java\\jdk1.7.0_51");
 		// TODO [SEVERE] Not everyone will have the same version
-		Bukkit.broadcastMessage("Java home: " + System.getProperty("java.home"));
 		// TODO warn user of change, also detect which version the user has
 		
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
