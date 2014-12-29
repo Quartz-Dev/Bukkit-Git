@@ -1,10 +1,17 @@
 package com.quartzdev.bukkitgit.gitevent;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.jar.Attributes;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 
 import javax.tools.DiagnosticCollector;
@@ -54,11 +61,17 @@ public class GitDownloader implements Runnable {
 			for (File file : files) {
 				if (Pattern.matches("([^\\s]+(\\.(?i)(java))$)", file.getName())) {
 					filesToCompile.add(file);
-				} else {
-					// TODO Simply move over files
 				}
 			}
 			compileJava(filesToCompile);
+			
+			files = FileUtils.listFiles(insideFolder, new RegexFileFilter("^(.*?)"), DirectoryFileFilter.DIRECTORY);
+			
+			Manifest manifest = new Manifest();
+			manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+			JarOutputStream target = new JarOutputStream(new FileOutputStream(newJar.getAbsoluteFile()), manifest);
+			moveFilesIntoJar(insideFolder, target);
+			target.close();
 			
 		} catch (IOException e) {
 			// TODO Make it do something useful
@@ -86,6 +99,43 @@ public class GitDownloader implements Runnable {
 		boolean success = task.call();
 		Bukkit.broadcastMessage("Success: " + success);
 		fileManager.close();
+	}
+	
+	private void moveFilesIntoJar(File source, JarOutputStream target) throws IOException {
+		BufferedInputStream in = null;
+		try {
+			if (source.isDirectory()) {
+				String name = source.getPath().replace("\\", "/");
+				if (!name.isEmpty()) {
+					if (!name.endsWith("/"))
+						name += "/";
+					JarEntry entry = new JarEntry(name);
+					entry.setTime(source.lastModified());
+					target.putNextEntry(entry);
+					target.closeEntry();
+				}
+				for (File nestedFile : source.listFiles())
+					moveFilesIntoJar(nestedFile, target);
+				return;
+			}
+			
+			JarEntry entry = new JarEntry(source.getPath().replace("\\", "/"));
+			entry.setTime(source.lastModified());
+			target.putNextEntry(entry);
+			in = new BufferedInputStream(new FileInputStream(source));
+			
+			byte[] buffer = new byte[1024];
+			while (true) {
+				int count = in.read(buffer);
+				if (count == -1)
+					break;
+				target.write(buffer, 0, count);
+			}
+			target.closeEntry();
+		} finally {
+			if (in != null)
+				in.close();
+		}
 	}
 	
 }
