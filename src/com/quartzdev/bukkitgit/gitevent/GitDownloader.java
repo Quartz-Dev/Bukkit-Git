@@ -38,6 +38,7 @@ public class GitDownloader implements Runnable {
 			String unzippedFolderPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + "unzip";
 			String destPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + ".zip";
 			String newJarPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + "jar_" + fileName + ".jar";
+			
 			File unzippedFolder = new File(unzippedFolderPath);
 			File dest = new File(destPath);
 			File newJar = new File(newJarPath);
@@ -59,6 +60,7 @@ public class GitDownloader implements Runnable {
 					Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromStrings(Arrays.asList(file.getPath()));
 					JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnits);
 					boolean success = task.call();
+					Bukkit.broadcastMessage("Success: " + success);
 					fileManager.close();
 				} else {
 					// TODO Simply move over files
