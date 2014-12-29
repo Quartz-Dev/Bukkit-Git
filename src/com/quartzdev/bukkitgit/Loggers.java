@@ -21,7 +21,7 @@ public class Loggers {
 		}
 		l.info(color + "=============" + endColor);
 		l.info(color + "Compare: " + event.getCompareLink() + endColor);
-		
+		// Oops
 	}
 	
 }
