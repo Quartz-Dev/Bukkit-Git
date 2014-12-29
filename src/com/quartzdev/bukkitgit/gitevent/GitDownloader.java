@@ -56,7 +56,7 @@ public class GitDownloader implements Runnable {
 					Bukkit.broadcastMessage("Java file: Path: " + file.getPath() + ", File: " + file.getName());
 					JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 					if (compiler == null) {
-						// TODO show error for bad version
+						// TODO show error for bad version, yeah
 						// https://www.java.net/node/688208
 						return;
 					}
