@@ -88,7 +88,6 @@ public class GitDownloader implements Runnable {
 			
 			dest.delete();
 			unzippedFolder.delete();
-			
 		} catch (IOException e) {
 			// TODO Make it do something useful
 			e.printStackTrace();
