@@ -55,6 +55,7 @@ public class GitDownloader implements Runnable {
 				if (Pattern.matches("([^\\s]+(\\.(?i)(java))$)", file.getName())) {
 					Bukkit.broadcastMessage("Java file: Path: " + file.getPath() + ", File: " + file.getName());
 					Bukkit.broadcastMessage("Java home: " + System.getProperty("java.home"));
+					System.setProperty("java.home", "C:\\Program Files\\Java\\jdk1.7.0_51");
 					
 					JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 					if (compiler == null) {
