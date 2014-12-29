@@ -160,19 +160,25 @@ public class GitDownloader implements Runnable {
 		if (isNew) {
 			try {
 				Bukkit.getPluginManager().loadPlugin(newPlugin);
-			} catch (UnknownDependencyException | InvalidPluginException | InvalidDescriptionException e) {
+			} catch (UnknownDependencyException | InvalidDescriptionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			} catch (InvalidPluginException e) {
+				reloadPlugin(pluginName);
 			}
 		} else {
-			Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
-			if (plugin != null) {
-				Bukkit.getPluginManager().disablePlugin(plugin);
-				Bukkit.getPluginManager().enablePlugin(plugin);
-			} else {
-				// TODO This means that their plugin.yml name wasn't the same as
-				// the repo name.
-			}
+			reloadPlugin(pluginName);
+		}
+	}
+	
+	private void reloadPlugin(String pluginName) {
+		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
+		if (plugin != null) {
+			Bukkit.getPluginManager().disablePlugin(plugin);
+			Bukkit.getPluginManager().enablePlugin(plugin);
+		} else {
+			// TODO This means that their plugin.yml name wasn't the same as
+			// the repo name.
 		}
 	}
 }
