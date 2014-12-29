@@ -173,7 +173,7 @@ public class GitDownloader implements Runnable {
 		if (plugin != null) {
 			Bukkit.getPluginManager().disablePlugin(plugin);
 			try {
-				wait(500);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
