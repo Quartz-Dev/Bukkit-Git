@@ -58,17 +58,18 @@ public class GitDownloader implements Runnable {
 				
 				try {
 					new File(newFile.getParent()).mkdirs();
+					
+					FileOutputStream fos = new FileOutputStream(newFile);
+					
+					int len;
+					while ((len = zis.read(buffer)) > 0) {
+						fos.write(buffer, 0, len);
+					}
+					
+					fos.close();
 				} catch (Exception e) {
 					// Do nothing
 				}
-				FileOutputStream fos = new FileOutputStream(newFile);
-				
-				int len;
-				while ((len = zis.read(buffer)) > 0) {
-					fos.write(buffer, 0, len);
-				}
-				
-				fos.close();
 				ze = zis.getNextEntry();
 			}
 			
