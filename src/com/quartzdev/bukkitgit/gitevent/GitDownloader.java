@@ -52,7 +52,7 @@ public class GitDownloader implements Runnable {
 			Collection<File> files = FileUtils.listFiles(insideFolder, new RegexFileFilter("^(.*?)"), DirectoryFileFilter.DIRECTORY);
 			for (File file : files) {
 				Bukkit.broadcastMessage("A file: Path: " + file.getPath() + ", File: " + file.getName());
-				if (Pattern.matches("(\\.java$)", file.getName())) {
+				if (Pattern.matches("([^\\s]+(\\.(?i)(java))$)", file.getName())) {
 					Bukkit.broadcastMessage("Java file: Path: " + file.getPath() + ", File: " + file.getName());
 					JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 					DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
