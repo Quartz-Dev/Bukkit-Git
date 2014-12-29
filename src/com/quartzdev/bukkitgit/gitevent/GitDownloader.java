@@ -86,7 +86,7 @@ public class GitDownloader implements Runnable {
 			target.close();
 			
 			dest.delete();
-			unzippedFolder.delete();
+			FileUtils.deleteDirectory(unzippedFolder);
 			
 			migrateJar(newJar, repoName);
 			
