@@ -61,6 +61,7 @@ public class GitDownloader implements Runnable {
 			File dest = new File(destPath);
 			File newJar = new File(newJarPath);
 			ArrayList<File> filesToCompile = new ArrayList<File>();
+			File newPlugin = new File("plugins" + File.separator + repoName + ".jar");
 			
 			FileUtils.copyURLToFile(website, dest);
 			
@@ -79,7 +80,7 @@ public class GitDownloader implements Runnable {
 			
 			Manifest manifest = new Manifest();
 			manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-			JarOutputStream target = new JarOutputStream(new FileOutputStream(newJar.getAbsoluteFile()), manifest);
+			JarOutputStream target = new JarOutputStream(new FileOutputStream(newPlugin.getAbsoluteFile()), manifest);
 			zipLoc = insideFolder.getPath();
 			moveFilesIntoJar(insideFolder, target);
 			target.close();
@@ -112,7 +113,6 @@ public class GitDownloader implements Runnable {
 		StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
 		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(files);
 		JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnits);
-		boolean success = task.call();
 		fileManager.close();
 	}
 	
@@ -155,23 +155,16 @@ public class GitDownloader implements Runnable {
 	
 	private void migrateJar(File jarFile, String pluginName) {
 		File newPlugin = new File("plugins" + File.separator + pluginName + ".jar");
-		boolean isNew = !newPlugin.exists();
-		if (!jarFile.renameTo(newPlugin)) {
-			Bukkit.broadcastMessage("The file wasn't renamed");
-		}
 		
-		if (isNew) {
-			try {
-				Bukkit.getPluginManager().loadPlugin(newPlugin);
-			} catch (UnknownDependencyException | InvalidDescriptionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvalidPluginException e) {
-				reloadPlugin(pluginName);
-			}
-		} else {
+		try {
+			Bukkit.getPluginManager().loadPlugin(newPlugin);
+		} catch (UnknownDependencyException | InvalidDescriptionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidPluginException e) {
 			reloadPlugin(pluginName);
 		}
+		
 	}
 	
 	private void reloadPlugin(String pluginName) {
