@@ -30,12 +30,14 @@ public class GitDownloader implements Runnable {
 	
 	@Override
 	public void run() {
+		byte[] buffer = new byte[1024];
+		
 		try {
 			// TODO allow choice for master branch or default branch maybe
 			URL website = new URL("https://api.github.com/repos/" + event.getRepositoryFullName() + "/" + event.getCompressionType() + "/" + event.getDefaultBranch());
 			String fileName = System.currentTimeMillis() + "";
 			File dest = new File("plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + ".zip");
-			File unzippedFolder = new File("plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + "unzip");
+			File unzippedFolder = new File("plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + "unzip" + File.separator);
 			File newJar = new File("plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + "jar_" + fileName + ".jar");
 			
 			FileUtils.copyURLToFile(website, dest);
@@ -59,7 +61,6 @@ public class GitDownloader implements Runnable {
 				FileOutputStream fos = new FileOutputStream(newFile);
 				
 				int len;
-				byte[] buffer = new byte[1024];
 				while ((len = zis.read(buffer)) > 0) {
 					fos.write(buffer, 0, len);
 				}
