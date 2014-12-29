@@ -42,12 +42,10 @@ public class GitDownloader implements Runnable {
 			FileUtils.copyURLToFile(website, dest);
 			
 			Unzipper uz = new Unzipper();
-			Bukkit.broadcastMessage("Arg 1- " + dest.getAbsolutePath());
-			Bukkit.broadcastMessage("Arg 2- " + unzippedFolder.getAbsolutePath());
 			uz.unzip(dest.getAbsolutePath(), unzippedFolder.getAbsolutePath());
 			
 			for (File file : unzippedFolder.listFiles()) {
-				if (Pattern.matches("*.java", file.getName())) {
+				if (Pattern.matches(".java", file.getName())) {
 					Bukkit.broadcastMessage("Java file: Path: " + file.getPath() + ", File: " + file.getName());
 					JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 					DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
