@@ -155,7 +155,9 @@ public class GitDownloader implements Runnable {
 	private void migrateJar(File jarFile, String pluginName) {
 		File newPlugin = new File("plugins" + File.separator + pluginName + ".jar");
 		boolean isNew = !newPlugin.exists();
-		jarFile.renameTo(newPlugin);
+		if (!jarFile.renameTo(newPlugin)) {
+			Bukkit.broadcastMessage("The file wasn't renamed");
+		}
 		
 		if (isNew) {
 			try {
