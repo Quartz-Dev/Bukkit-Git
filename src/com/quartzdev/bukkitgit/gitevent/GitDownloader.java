@@ -172,6 +172,11 @@ public class GitDownloader implements Runnable {
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin != null) {
 			Bukkit.getPluginManager().disablePlugin(plugin);
+			try {
+				wait(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			Bukkit.getPluginManager().enablePlugin(plugin);
 		} else {
 			// TODO This means that their plugin.yml name wasn't the same as
