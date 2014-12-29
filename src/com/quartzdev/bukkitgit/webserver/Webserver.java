@@ -47,14 +47,10 @@ public class Webserver implements Runnable {
 				Socket connectionsocket = serverSocket.accept();
 				// TODO Make message logs more useful.
 				BufferedReader input = new BufferedReader(new InputStreamReader(connectionsocket.getInputStream()));
-				RequestType rt = null;
 				String line = input.readLine();
+				RequestType rt = setRequestType(line);
+				
 				// logMessage("First line: " + line);
-				if (line.startsWith("GET")) {
-					rt = RequestType.GET;
-				} else if (line.startsWith("POST")) {
-					rt = RequestType.POST;
-				}
 				
 				boolean hasBody = false;
 				int contentLength = 0;
@@ -186,7 +182,7 @@ public class Webserver implements Runnable {
 		return new WebRequest(rt, headers, body);
 	}
 	
-	public static String hmac(String data, String key) throws java.security.SignatureException {
+	private static String hmac(String data, String key) throws java.security.SignatureException {
 		String result;
 		try {
 			
@@ -207,6 +203,15 @@ public class Webserver implements Runnable {
 			throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
 		}
 		return result;
+	}
+	
+	private RequestType setRequestType(String type) {
+		if (type.startsWith("GET")) {
+			return RequestType.GET;
+		} else if (type.startsWith("POST")) {
+			return RequestType.POST;
+		}
+		return null;
 	}
 	
 }
