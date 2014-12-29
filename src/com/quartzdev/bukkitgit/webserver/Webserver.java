@@ -87,6 +87,8 @@ public class Webserver implements Runnable {
 							if (header.startsWith("X-Hub-Signature:")) {
 								String recievedDigest = header.split("sha1=")[1];
 								String ourDigest = hmac(request.getContent(), secret);
+								Bukkit.broadcastMessage("Theirs: " + recievedDigest);
+								Bukkit.broadcastMessage("Ours: " + ourDigest);
 								if (recievedDigest.equals(ourDigest)) {
 									secure = true;
 								}
