@@ -10,16 +10,18 @@ public class GitEvent extends WebRequest {
 	private String masterBranch;
 	private String defaultBranch;
 	private String repositoryFullName;
+	private String repositoryName;
 	private String compressionType;
 	private String compareLink;
 	private String commiter;
 	private String commitMessage;
 	
-	public GitEvent(RequestType type, ArrayList<String> headers, String content, String masterBranch, String defaultBranch, String repositoryFullName, String compressionType, String compareLink, String commiter, String commitMessage) {
+	public GitEvent(RequestType type, ArrayList<String> headers, String content, String masterBranch, String defaultBranch, String repositoryFullName, String repositoryName, String compressionType, String compareLink, String commiter, String commitMessage) {
 		super(type, headers, content);
 		this.masterBranch = masterBranch;
 		this.defaultBranch = defaultBranch;
 		this.repositoryFullName = repositoryFullName;
+		this.repositoryName = repositoryName;
 		this.compressionType = compressionType;
 		this.compareLink = compareLink;
 		this.commiter = commiter;
@@ -36,6 +38,10 @@ public class GitEvent extends WebRequest {
 	
 	public String getRepositoryFullName() {
 		return repositoryFullName;
+	}
+	
+	public String getRepositoryName() {
+		return repositoryName;
 	}
 	
 	public String getCompressionType() {

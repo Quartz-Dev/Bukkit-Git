@@ -25,14 +25,25 @@ import net.minecraft.util.org.apache.commons.io.filefilter.DirectoryFileFilter;
 import net.minecraft.util.org.apache.commons.io.filefilter.RegexFileFilter;
 
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.InvalidDescriptionException;
+import org.bukkit.plugin.InvalidPluginException;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.UnknownDependencyException;
 
 public class GitDownloader implements Runnable {
 	
-	private GitEvent event;
+	private String repoFullName;
+	private String defaultBranch;
+	private String compressionType;
+	private String repoName;
+	
 	private String zipLoc;
 	
 	public GitDownloader(GitEvent event) {
-		this.event = event;
+		repoFullName = event.getRepositoryFullName();
+		repoName = event.getRepositoryName();
+		defaultBranch = event.getDefaultBranch();
+		compressionType = event.getCompressionType();
 		zipLoc = null;
 	}
 	
@@ -41,7 +52,7 @@ public class GitDownloader implements Runnable {
 		
 		try {
 			// TODO allow choice for master branch or default branch maybe
-			URL website = new URL("https://api.github.com/repos/" + event.getRepositoryFullName() + "/" + event.getCompressionType() + "/" + event.getDefaultBranch());
+			URL website = new URL("https://api.github.com/repos/" + repoFullName + "/" + compressionType + "/" + defaultBranch);
 			String fileName = System.currentTimeMillis() + "";
 			String unzippedFolderPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + "unzip";
 			String destPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + ".zip";
@@ -73,6 +84,8 @@ public class GitDownloader implements Runnable {
 			zipLoc = insideFolder.getPath();
 			moveFilesIntoJar(insideFolder, target);
 			target.close();
+			
+			migrateJar(newJar, repoName);
 			
 		} catch (IOException e) {
 			// TODO Make it do something useful
@@ -107,7 +120,6 @@ public class GitDownloader implements Runnable {
 		try {
 			if (source.isDirectory()) {
 				String name = source.getPath().replace(zipLoc, "").replace("\\", "/").replaceFirst("/", "");
-				Bukkit.broadcastMessage("Name: " + name);
 				if (!name.isEmpty()) {
 					if (!name.endsWith("/"))
 						name += "/";
@@ -122,7 +134,6 @@ public class GitDownloader implements Runnable {
 			}
 			
 			JarEntry entry = new JarEntry(source.getPath().replace(zipLoc, "").replace("\\", "/").replaceFirst("/", ""));
-			Bukkit.broadcastMessage("Entry: " + source.getPath().replace(zipLoc, "").replace("\\", "/").replaceFirst("/", ""));
 			entry.setTime(source.lastModified());
 			target.putNextEntry(entry);
 			in = new BufferedInputStream(new FileInputStream(source));
@@ -141,4 +152,27 @@ public class GitDownloader implements Runnable {
 		}
 	}
 	
+	private void migrateJar(File jarFile, String pluginName) {
+		File newPlugin = new File("plugins" + File.separator + pluginName + ".jar");
+		boolean isNew = !newPlugin.exists();
+		jarFile.renameTo(newPlugin);
+		
+		if (isNew) {
+			try {
+				Bukkit.getPluginManager().loadPlugin(newPlugin);
+			} catch (UnknownDependencyException | InvalidPluginException | InvalidDescriptionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
+			if (plugin != null) {
+				Bukkit.getPluginManager().disablePlugin(plugin);
+				Bukkit.getPluginManager().enablePlugin(plugin);
+			} else {
+				// TODO This means that their plugin.yml name wasn't the same as
+				// the repo name.
+			}
+		}
+	}
 }
