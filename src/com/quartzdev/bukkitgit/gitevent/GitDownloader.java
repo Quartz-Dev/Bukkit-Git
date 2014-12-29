@@ -45,7 +45,8 @@ public class GitDownloader implements Runnable {
 			uz.unzip(dest.getAbsolutePath(), unzippedFolder.getAbsolutePath());
 			
 			for (File file : unzippedFolder.listFiles()) {
-				if (Pattern.matches(".java", file.getName())) {
+				Bukkit.broadcastMessage("A file: Path: " + file.getPath() + ", File: " + file.getName());
+				if (Pattern.matches("(\\.java$)", file.getName())) {
 					Bukkit.broadcastMessage("Java file: Path: " + file.getPath() + ", File: " + file.getName());
 					JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 					DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
@@ -65,5 +66,4 @@ public class GitDownloader implements Runnable {
 		}
 		
 	}
-	
 }
