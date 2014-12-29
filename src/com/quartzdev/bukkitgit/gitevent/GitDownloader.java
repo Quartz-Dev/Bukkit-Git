@@ -113,6 +113,7 @@ public class GitDownloader implements Runnable {
 		StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
 		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(files);
 		JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnits);
+		task.call();
 		fileManager.close();
 	}
 	
