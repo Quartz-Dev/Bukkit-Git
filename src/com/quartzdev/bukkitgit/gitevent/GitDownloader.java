@@ -3,7 +3,7 @@ package com.quartzdev.bukkitgit.gitevent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
@@ -38,10 +38,10 @@ public class GitDownloader implements Runnable {
 			String unzippedFolderPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + "unzip";
 			String destPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + fileName + ".zip";
 			String newJarPath = "plugins" + File.separator + "Bukkit-Git" + File.separator + "downloads" + File.separator + "jar_" + fileName + ".jar";
-			
 			File unzippedFolder = new File(unzippedFolderPath);
 			File dest = new File(destPath);
 			File newJar = new File(newJarPath);
+			ArrayList<File> filesToCompile = new ArrayList<File>();
 			
 			FileUtils.copyURLToFile(website, dest);
 			
@@ -53,34 +53,40 @@ public class GitDownloader implements Runnable {
 			Collection<File> files = FileUtils.listFiles(insideFolder, new RegexFileFilter("^(.*?)"), DirectoryFileFilter.DIRECTORY);
 			for (File file : files) {
 				if (Pattern.matches("([^\\s]+(\\.(?i)(java))$)", file.getName())) {
-					Bukkit.broadcastMessage("Java file: Path: " + file.getPath() + ", File: " + file.getName());
-					Bukkit.broadcastMessage("Java home: " + System.getProperty("java.home"));
-					System.setProperty("java.home", "C:\\Program Files\\Java\\jdk1.7.0_51");
-					
-					JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-					if (compiler == null) {
-						// TODO show error for bad version, yeah
-						// https://www.java.net/node/688208
-						Bukkit.broadcastMessage("Compiler is null!");
-						return;
-					}
-					DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
-					StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
-					Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromStrings(Arrays.asList(file.getPath()));
-					JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnits);
-					boolean success = task.call();
-					Bukkit.broadcastMessage("Success: " + success);
-					fileManager.close();
+					filesToCompile.add(file);
 				} else {
 					// TODO Simply move over files
 				}
 			}
+			compileJava(filesToCompile);
 			
 		} catch (IOException e) {
 			// TODO Make it do something useful
 			e.printStackTrace();
 		}
 		
+	}
+	
+	private void compileJava(ArrayList<File> files) throws IOException {
+		System.setProperty("java.home", "C:\\Program Files\\Java\\jdk1.7.0_51");
+		// TODO [SEVERE] Not everyone will have the same version
+		Bukkit.broadcastMessage("Java home: " + System.getProperty("java.home"));
+		// TODO warn user of change, also detect which version the user has
+		
+		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+		if (compiler == null) {
+			// TODO show error for bad version, yeah
+			// https://www.java.net/node/688208
+			Bukkit.broadcastMessage("Compiler is null!");
+			return;
+		}
+		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+		StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromFiles(files);
+		JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnits);
+		boolean success = task.call();
+		Bukkit.broadcastMessage("Success: " + success);
+		fileManager.close();
 	}
 	
 }
