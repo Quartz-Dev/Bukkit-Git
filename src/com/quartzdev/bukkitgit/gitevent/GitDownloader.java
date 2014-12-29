@@ -71,9 +71,7 @@ public class GitDownloader implements Runnable {
 			manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
 			JarOutputStream target = new JarOutputStream(new FileOutputStream(newJar.getAbsoluteFile()), manifest);
 			Bukkit.broadcastMessage("Inside folder: " + insideFolder);
-			for (File f : insideFolder.listFiles()) {
-				moveFilesIntoJar(f, target);
-			}
+			moveFilesIntoJar(insideFolder, target);
 			target.close();
 			
 		} catch (IOException e) {
@@ -122,7 +120,7 @@ public class GitDownloader implements Runnable {
 				return;
 			}
 			
-			JarEntry entry = new JarEntry(source.getPath().replace("\\", "/"));
+			JarEntry entry = new JarEntry(source.getPath().replace("\\", "/").replace(source.getPath(), ""));
 			entry.setTime(source.lastModified());
 			target.putNextEntry(entry);
 			in = new BufferedInputStream(new FileInputStream(source));
