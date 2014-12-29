@@ -180,7 +180,7 @@ public class GitDownloader implements Runnable {
 			Bukkit.getPluginManager().enablePlugin(plugin);
 		} else {
 			// TODO This means that their plugin.yml name wasn't the same as
-			// the repo name.
+			// the repository name.
 		}
 	}
 }
