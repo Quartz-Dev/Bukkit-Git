@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 import javax.tools.DiagnosticCollector;
@@ -13,6 +14,8 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
 import net.minecraft.util.org.apache.commons.io.FileUtils;
+import net.minecraft.util.org.apache.commons.io.filefilter.DirectoryFileFilter;
+import net.minecraft.util.org.apache.commons.io.filefilter.RegexFileFilter;
 
 import org.bukkit.Bukkit;
 
@@ -44,7 +47,10 @@ public class GitDownloader implements Runnable {
 			Unzipper uz = new Unzipper();
 			uz.unzip(dest.getAbsolutePath(), unzippedFolder.getAbsolutePath());
 			
-			for (File file : unzippedFolder.listFiles()) {
+			File insideFolder = unzippedFolder.listFiles()[0];
+			
+			Collection<File> files = FileUtils.listFiles(insideFolder, new RegexFileFilter("^(.*?)"), DirectoryFileFilter.DIRECTORY);
+			for (File file : files) {
 				Bukkit.broadcastMessage("A file: Path: " + file.getPath() + ", File: " + file.getName());
 				if (Pattern.matches("(\\.java$)", file.getName())) {
 					Bukkit.broadcastMessage("Java file: Path: " + file.getPath() + ", File: " + file.getName());
@@ -66,4 +72,5 @@ public class GitDownloader implements Runnable {
 		}
 		
 	}
+	
 }
