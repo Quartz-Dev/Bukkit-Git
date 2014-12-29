@@ -14,11 +14,13 @@ public class Loggers {
 		String color = Ansi.ansi().fg(Ansi.Color.CYAN) + "";
 		String endColor = Ansi.ansi().fg(Ansi.Color.DEFAULT) + "";
 		
-		l.info(color + "=============" + endColor);
 		l.info(color + "New Github push to " + event.getRepositoryFullName() + " by " + event.getCommiter() + endColor);
-		l.info(color + event.getCommitMessage() + endColor);
-		l.info(color + "Compare: " + event.getCompareLink() + endColor);
 		l.info(color + "=============" + endColor);
+		for (String s : event.getCommitMessage().split("\\n")) {
+			l.info(color + s + endColor);
+		}
+		l.info(color + "=============" + endColor);
+		l.info(color + "Compare: " + event.getCompareLink() + endColor);
 		
 	}
 	
