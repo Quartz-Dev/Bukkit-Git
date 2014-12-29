@@ -58,6 +58,8 @@ public class GitDownloader implements Runnable {
 					if (compiler == null) {
 						// TODO show error for bad version, yeah
 						// https://www.java.net/node/688208
+						Bukkit.broadcastMessage("Compiler is null!");
+						Bukkit.broadcastMessage("Java home: " + System.getProperty("java.home"));
 						return;
 					}
 					DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
