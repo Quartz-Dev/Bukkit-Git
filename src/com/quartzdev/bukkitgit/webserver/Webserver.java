@@ -12,7 +12,8 @@ import java.util.ArrayList;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
+
+import net.minecraft.util.org.apache.commons.codec.binary.Hex;
 
 import org.bukkit.Bukkit;
 
@@ -87,8 +88,6 @@ public class Webserver implements Runnable {
 							if (header.startsWith("X-Hub-Signature:")) {
 								String recievedDigest = header.split("sha1=")[1];
 								String ourDigest = hmac(request.getContent(), secret);
-								Bukkit.broadcastMessage("Theirs: " + recievedDigest);
-								Bukkit.broadcastMessage("Ours: " + ourDigest);
 								if (recievedDigest.equals(ourDigest)) {
 									secure = true;
 								}
@@ -199,7 +198,7 @@ public class Webserver implements Runnable {
 			byte[] rawHmac = mac.doFinal(data.getBytes());
 			
 			// base64-encode the hmac
-			result = DatatypeConverter.printBase64Binary(rawHmac);
+			result = Hex.encodeHexString(rawHmac);
 			
 		} catch (Exception e) {
 			throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
