@@ -4,17 +4,17 @@ import java.util.ArrayList;
 
 public class WebRequest {
 	
-	private RequestType type;
+	private String type;
 	private ArrayList<String> headers;
 	private String content;
 	
-	public WebRequest(RequestType type, ArrayList<String> headers, String content) {
+	public WebRequest(String type, ArrayList<String> headers, String content) {
 		this.type = type;
 		this.headers = headers;
 		this.content = content;
 	}
 	
-	public RequestType getType() {
+	public String getType() {
 		return type;
 	}
 	

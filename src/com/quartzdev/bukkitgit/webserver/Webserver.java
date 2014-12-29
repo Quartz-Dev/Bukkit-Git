@@ -56,7 +56,7 @@ public class Webserver implements Runnable {
 				Socket connectionsocket = serverSocket.accept();
 				BufferedReader input = new BufferedReader(new InputStreamReader(connectionsocket.getInputStream()));
 				String line = input.readLine();
-				RequestType rt = setRequestType(line);
+				String rt = line.split(" ")[0];
 				
 				boolean hasBody = false;
 				int contentLength = 0;
@@ -84,7 +84,7 @@ public class Webserver implements Runnable {
 				
 				boolean worked = false;
 				DataOutputStream output = new DataOutputStream(connectionsocket.getOutputStream());
-				if (request.getType() == RequestType.POST) {
+				if (request.getType().equals("POST")) {
 					if (request.getHeaders().indexOf("X-GitHub-Event: push") >= 0) {
 						
 						boolean secure = false;
@@ -179,8 +179,8 @@ public class Webserver implements Runnable {
 		}
 	}
 	
-	private WebRequest createWebRequest(RequestType rt, ArrayList<String> headers, String body) {
-		return new WebRequest(rt, headers, body);
+	private WebRequest createWebRequest(String requestType, ArrayList<String> headers, String body) {
+		return new WebRequest(requestType, headers, body);
 	}
 	
 	private static String hmac(String data, String key) throws java.security.SignatureException {
@@ -197,15 +197,6 @@ public class Webserver implements Runnable {
 			throw new SignatureException("Failed to generate HMAC : " + e.getMessage());
 		}
 		return result;
-	}
-	
-	private RequestType setRequestType(String type) {
-		if (type.startsWith("GET")) {
-			return RequestType.GET;
-		} else if (type.startsWith("POST")) {
-			return RequestType.POST;
-		}
-		return null;
 	}
 	
 }

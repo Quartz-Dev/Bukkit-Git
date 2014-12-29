@@ -2,7 +2,6 @@ package com.quartzdev.bukkitgit.gitevent;
 
 import java.util.ArrayList;
 
-import com.quartzdev.bukkitgit.webserver.RequestType;
 import com.quartzdev.bukkitgit.webserver.WebRequest;
 
 public class GitEvent extends WebRequest {
@@ -16,7 +15,7 @@ public class GitEvent extends WebRequest {
 	private String commiter;
 	private String commitMessage;
 	
-	public GitEvent(RequestType type, ArrayList<String> headers, String content, String masterBranch, String defaultBranch, String repositoryFullName, String repositoryName, String compressionType, String compareLink, String commiter, String commitMessage) {
+	public GitEvent(String type, ArrayList<String> headers, String content, String masterBranch, String defaultBranch, String repositoryFullName, String repositoryName, String compressionType, String compareLink, String commiter, String commitMessage) {
 		super(type, headers, content);
 		this.masterBranch = masterBranch;
 		this.defaultBranch = defaultBranch;
