@@ -106,7 +106,7 @@ public class GitDownloader implements Runnable {
 		BufferedInputStream in = null;
 		try {
 			if (source.isDirectory()) {
-				String name = source.getPath().replace(zipLoc, "").replace("\\", "/").substring(1);
+				String name = source.getPath().replace(zipLoc, "").replace("\\", "/").replace("/", "");
 				Bukkit.broadcastMessage("Name: " + name);
 				if (!name.isEmpty()) {
 					if (!name.endsWith("/"))
@@ -121,8 +121,8 @@ public class GitDownloader implements Runnable {
 				return;
 			}
 			
-			JarEntry entry = new JarEntry(source.getPath().replace(zipLoc, "").replace("\\", "/").substring(1));
-			Bukkit.broadcastMessage("Entry: " + source.getPath().replace(zipLoc, "").replace("\\", "/").substring(1));
+			JarEntry entry = new JarEntry(source.getPath().replace(zipLoc, "").replace("\\", "/").replace("/", ""));
+			Bukkit.broadcastMessage("Entry: " + source.getPath().replace(zipLoc, "").replace("\\", "/").replace("/", ""));
 			entry.setTime(source.lastModified());
 			target.putNextEntry(entry);
 			in = new BufferedInputStream(new FileInputStream(source));
