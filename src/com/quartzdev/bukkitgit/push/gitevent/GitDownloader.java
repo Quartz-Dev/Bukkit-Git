@@ -1,4 +1,4 @@
-package com.quartzdev.bukkitgit.gitevent;
+package com.quartzdev.bukkitgit.push.gitevent;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -28,11 +28,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.UnknownDependencyException;
 
 import com.quartzdev.bukkitgit.Loggers;
 
-public class GitDownloader implements Runnable {
+public class GitDownloader {
 	
 	private final static String JDK_ARTICLE = "https://github.com/Quartz-Dev/Bukkit-Git/wiki/Why-JDKs-are-important";
 	
@@ -42,22 +43,22 @@ public class GitDownloader implements Runnable {
 	private String repoName;
 	
 	private String zipLoc;
-	private Plugin plugin;
+	private PluginManager pluginManager;
 	
 	private File dest;
 	private File unzippedFolder;
 	
-	public GitDownloader(GitEvent event, Plugin plugin) {
+	public GitDownloader(PluginManager pm) {
+		this.pluginManager = pm;
+		zipLoc = null;
+	}
+	
+	public void download(GitEvent event) {
+		
 		repoFullName = event.getRepositoryFullName();
 		repoName = event.getRepositoryName();
 		defaultBranch = event.getDefaultBranch();
 		compressionType = event.getCompressionType();
-		zipLoc = null;
-		this.plugin = plugin;
-	}
-	
-	@Override
-	public void run() {
 		
 		try {
 			// TODO allow choice for master branch or default branch maybe
@@ -125,7 +126,8 @@ public class GitDownloader implements Runnable {
 				Loggers.logError("Please see the GitHub article about why a JDK is important for this plugin");
 				Loggers.logError(JDK_ARTICLE);
 				deleteTempFiles();
-				Bukkit.getPluginManager().disablePlugin(plugin);
+				pluginManager.disablePlugin(plugin);
+				// TODO
 				return;
 			}
 		}

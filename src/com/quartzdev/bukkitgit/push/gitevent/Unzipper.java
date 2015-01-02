@@ -1,4 +1,4 @@
-package com.quartzdev.bukkitgit.gitevent;
+package com.quartzdev.bukkitgit.push.gitevent;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

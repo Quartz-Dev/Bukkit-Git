@@ -1,8 +1,8 @@
-package com.quartzdev.bukkitgit.gitevent;
+package com.quartzdev.bukkitgit.push.gitevent;
 
 import java.util.ArrayList;
 
-import com.quartzdev.bukkitgit.webserver.WebRequest;
+import com.quartzdev.bukkitgit.push.webserver.WebRequest;
 
 public class GitEvent extends WebRequest {
 	

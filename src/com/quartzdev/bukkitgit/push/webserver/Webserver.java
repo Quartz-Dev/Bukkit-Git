@@ -1,4 +1,4 @@
-package com.quartzdev.bukkitgit.webserver;
+package com.quartzdev.bukkitgit.push.webserver;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -15,10 +15,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 import net.minecraft.util.org.apache.commons.codec.binary.Hex;
 
-import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 
 import com.quartzdev.bukkitgit.Loggers;
-import com.quartzdev.bukkitgit.gitevent.GitEventParser;
+import com.quartzdev.bukkitgit.push.gitevent.GitEventParser;
 
 public class Webserver implements Runnable {
 	
@@ -29,14 +29,14 @@ public class Webserver implements Runnable {
 	private String secret;
 	private int timesPingRecieved;
 	ServerSocket serverSocket;
-	Plugin plugin;
+	GitEventParser parser;
 	
-	public Webserver(int port, String secret, Plugin plugin) {
+	public Webserver(int port, String secret, PluginManager pluginManager) {
 		this.port = port;
 		serverSocket = null;
 		this.secret = secret;
 		timesPingRecieved = 0;
-		this.plugin = plugin;
+		parser = new GitEventParser(pluginManager);
 	}
 	
 	@Override
@@ -101,7 +101,7 @@ public class Webserver implements Runnable {
 						if (secure) {
 							sendHeader(output, "HTTP/1.0 200 OK");
 							worked = true;
-							GitEventParser.createNewGitEvent(request, plugin);
+							parser.createNewGitEvent(request);
 						} else {
 							sendHeader(output, "HTTP/1.0 400 Bad Request");
 						}

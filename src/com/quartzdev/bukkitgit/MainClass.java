@@ -2,7 +2,7 @@ package com.quartzdev.bukkitgit;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.quartzdev.bukkitgit.webserver.Webserver;
+import com.quartzdev.bukkitgit.push.webserver.Webserver;
 
 public class MainClass extends JavaPlugin {
 	
@@ -17,6 +17,7 @@ public class MainClass extends JavaPlugin {
 		webserver = new Webserver(port, secret, this);
 		Thread thread = new Thread(webserver);
 		thread.start();
+		
 	}
 	
 	public void onDisable() {

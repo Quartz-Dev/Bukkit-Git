@@ -1,4 +1,4 @@
-package com.quartzdev.bukkitgit.webserver;
+package com.quartzdev.bukkitgit.push.webserver;
 
 import java.util.ArrayList;
 

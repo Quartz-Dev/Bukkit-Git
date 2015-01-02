@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.fusesource.jansi.Ansi;
 
-import com.quartzdev.bukkitgit.gitevent.GitEvent;
+import com.quartzdev.bukkitgit.push.gitevent.GitEvent;
 
 public class Loggers {
 	
